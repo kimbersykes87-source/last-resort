@@ -152,6 +152,15 @@ The app uses a **Cloudflare Worker function** (`functions/api-proxy.js`) to hand
 
 This is more reliable than relying on Apps Script's CORS implementation.
 
+## 🎨 UI Features
+
+- **Dark theme** with modern design
+- **Loading indicator** with rotating snowflake and "Loading..." text
+- **Interactive maps** using Leaflet
+- **Responsive design** for mobile and desktop
+- **Toast notifications** for user feedback
+- **White favicon** for clean branding
+
 ## 📝 Configuration
 
 ### Update Apps Script URL
