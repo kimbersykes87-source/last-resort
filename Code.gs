@@ -103,10 +103,20 @@ function writeUserRowByEmail_(emailLC, mutatorFn){
 
 /* ------------------------------ CORS HELPERS ------------------------------ */
 function setCorsHeaders_(output){
-  // Set MIME type
   output.setMimeType(ContentService.MimeType.JSON);
-  // Note: setHeaders() may not be available on TextOutput in all Apps Script versions
-  // CORS headers are handled by the deployment settings and doOptions() function
+  // Try to set headers - if not available, deployment settings should handle it
+  try {
+    if (typeof output.setHeaders === 'function') {
+      output.setHeaders({
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '3600'
+      });
+    }
+  } catch (e) {
+    // setHeaders not available
+  }
   return output;
 }
 
@@ -129,11 +139,9 @@ function doPost(e){
 
 // Handle CORS preflight requests
 function doOptions(e){
-  // Return empty response - CORS headers should be set at deployment level
-  // If setHeaders() is available, uncomment the lines below
   var output = ContentService.createTextOutput('');
   output.setMimeType(ContentService.MimeType.TEXT);
-  // Try to set headers if method exists (may not be available in all versions)
+  // Set CORS headers for preflight
   try {
     if (typeof output.setHeaders === 'function') {
       output.setHeaders({
@@ -144,7 +152,9 @@ function doOptions(e){
       });
     }
   } catch (e) {
-    // setHeaders not available - will rely on deployment settings
+    // If setHeaders doesn't work, try HtmlService approach
+    return HtmlService.createHtmlOutput('')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
   return output;
 }
