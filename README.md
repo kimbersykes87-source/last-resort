@@ -31,8 +31,12 @@ A web application for tracking visited ski resorts around the world. Built with 
 ├── wrangler.toml          # Cloudflare configuration
 ├── _redirects              # Cloudflare Pages routing
 ├── .gitignore             # Git ignore rules
+├── README.md              # Main documentation
+├── PROJECT_SUMMARY.md     # Project overview
+├── LOCAL_REVIEW_GUIDE.md  # Guide for reviewing changes
 ├── Icons/                 # App icons
 ├── Backgrounds/           # Background images
+├── LastResort_Icon.svg    # Favicon (white fill)
 └── Code.gs                # Apps Script backend (reference only)
 ```
 
