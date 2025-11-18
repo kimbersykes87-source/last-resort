@@ -42,6 +42,7 @@
       background: rgba(0,0,0,.25); backdrop-filter: blur(1px); z-index: 60;
     }
     .loader-overlay .flake { font-size: 112px; color: #fff; animation: spin 1.2s linear infinite; }
+    .loader-overlay .loader-text { margin-top: 1rem; font-size: 1.25rem; color: #fff; text-align: center; }
     .loader-show { display: grid; }
     /* Flags: keep text start aligned regardless of flag width */
     .flagwrap { display:inline-block; width:24px; vertical-align:-2px; }
@@ -212,7 +213,12 @@
   <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 hidden"></div>
   <!-- ============================= APP SCRIPT ================================ -->
   <script src="app.js"></script>
-  <div id="loader" class="loader-overlay"><div class="flake">❄︎</div></div>
+  <div id="loader" class="loader-overlay">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <div class="flake">❄︎</div>
+      <div class="loader-text">Loading...</div>
+    </div>
+  </div>
 </body>
 </html>
 
