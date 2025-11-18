@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+        button { padding: 10px 20px; margin: 10px 5px; background: #7c3aed; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #6d28d9; }
+        pre { background: #2a2a2a; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <h1>Last Resort API Connection Test</h1>
+    <p>This page helps debug API connection issues.</p>
+    
+    <div>
+        <button onclick="testConnection()">Test Connection</button>
+        <button onclick="testGetResorts()">Test Get Resorts</button>
+        <button onclick="testLogin()">Test Login</button>
+        <button onclick="testSignup()">Test Signup</button>
+    </div>
+    
+    <h2>Results:</h2>
+    <pre id="result">Click a button above to test...</pre>
+    
+    <script>
+        // Use local CORS proxy for localhost (handles Apps Script redirects)
+        const directUrl = 'https://script.google.com/macros/s/AKfycbzSl4REI2WDdc4RvGiSNeoxNM6hbFMWx4qXwpHwDS2v60FolqlKdGetUhUefK1dX-DrcQ/exec';
+        const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? 'http://localhost:3000/proxy?url=' + encodeURIComponent(directUrl)
+            : directUrl;
+        
+        function log(message, isError = false) {
+            const result = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = isError ? 'error' : 'success';
+            result.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            result.scrollTop = result.scrollHeight;
+        }
+        
+        async function testConnection() {
+            log('Testing OPTIONS (preflight) request...');
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'OPTIONS',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                log(`OPTIONS Status: ${response.status} ${response.statusText}`);
+                log(`CORS Headers: ${JSON.stringify([...response.headers.entries()], null, 2)}`);
+            } catch (e) {
+                log(`OPTIONS Error: ${e.message}`, true);
+            }
+        }
+        
+        async function testGetResorts() {
+            log('Testing getResorts action...');
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getResorts' })
+                });
+                log(`Response Status: ${response.status} ${response.statusText}`);
+                log(`Response Headers: ${JSON.stringify([...response.headers.entries()], null, 2)}`);
+                
+                const text = await response.text();
+                log(`Response Body (first 500 chars): ${text.substring(0, 500)}`);
+                
+                try {
+                    const json = JSON.parse(text);
+                    log(`Parsed JSON: ${JSON.stringify(json, null, 2)}`);
+                } catch (e) {
+                    log(`JSON Parse Error: ${e.message}`, true);
+                }
+            } catch (e) {
+                log(`Request Error: ${e.message}`, true);
+            }
+        }
+        
+        async function testLogin() {
+            const email = prompt('Enter email to test login:');
+            const password = prompt('Enter password:');
+            if (!email || !password) {
+                log('Login test cancelled', true);
+                return;
+            }
+            
+            log(`Testing login for: ${email}`);
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'loginUser', 
+                        email: email.toLowerCase().trim(),
+                        password: password
+                    })
+                });
+                log(`Response Status: ${response.status} ${response.statusText}`);
+                
+                const text = await response.text();
+                log(`Response Body: ${text}`);
+                
+                try {
+                    const json = JSON.parse(text);
+                    if (json.success) {
+                        log(`Login SUCCESS! User: ${json.data.firstName} ${json.data.lastName}`);
+                    } else {
+                        log(`Login FAILED: ${json.message}`, true);
+                    }
+                } catch (e) {
+                    log(`JSON Parse Error: ${e.message}`, true);
+                }
+            } catch (e) {
+                log(`Request Error: ${e.message}`, true);
+            }
+        }
+        
+        async function testSignup() {
+            const firstName = prompt('Enter first name:');
+            const lastName = prompt('Enter last name:');
+            const email = prompt('Enter email:');
+            const password = prompt('Enter password:');
+            
+            if (!firstName || !lastName || !email || !password) {
+                log('Signup test cancelled', true);
+                return;
+            }
+            
+            log(`Testing signup for: ${email}`);
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        action: 'signUpUser',
+                        firstName: firstName.trim(),
+                        lastName: lastName.trim(),
+                        email: email.toLowerCase().trim(),
+                        password: password
+                    })
+                });
+                log(`Response Status: ${response.status} ${response.statusText}`);
+                
+                const text = await response.text();
+                log(`Response Body: ${text}`);
+                
+                try {
+                    const json = JSON.parse(text);
+                    if (json.success) {
+                        log(`Signup SUCCESS! User created.`);
+                    } else {
+                        log(`Signup FAILED: ${json.message}`, true);
+                    }
+                } catch (e) {
+                    log(`JSON Parse Error: ${e.message}`, true);
+                }
+            } catch (e) {
+                log(`Request Error: ${e.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>
+

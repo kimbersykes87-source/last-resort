@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Track your visited ski resorts around the world"/>
+  <title>Last Resort</title>
+  <link rel="icon" type="image/svg+xml" href="/LastResort_Icon.svg"/>
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sreda:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    /* ============================== BASE / THEME ============================== */
+    :root { color-scheme: dark; }
+    html, body, #app { height: 100%; }
+    body {
+      background: #0b0f14;
+      color: #e5e7eb;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 0;
+    }
+    .card { background: #111827; border: 1px solid #1f2937; }
+    .tab-btn { border-bottom: 2px solid transparent; }
+    .tab-btn.active { border-color: #7c3aed; color: #fff; }
+    #map, #othersMap { height: 420px; border-radius: 1rem; }
+    .logo-compact svg { width: 44px; height: 44px; display: block; color: #fff; }
+    /* App Title */
+    .app-title {
+      font-family: Sreda, Inter, ui-serif, Georgia, serif;
+      letter-spacing: 0.2px;
+    }
+    /* Loader */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-overlay {
+      position: fixed; inset: 0; display: none; place-items: center;
+      background: rgba(0,0,0,.25); backdrop-filter: blur(1px); z-index: 60;
+    }
+    .loader-overlay .flake { font-size: 112px; color: #fff; animation: spin 1.2s linear infinite; }
+    .loader-show { display: grid; }
+    /* Flags: keep text start aligned regardless of flag width */
+    .flagwrap { display:inline-block; width:24px; vertical-align:-2px; }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+  <div id="app" class="max-w-6xl mx-auto">
+    <!-- ========================== APP HEADER (GLOBAL) ========================== -->
+    <header class="mb-6 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="logo-compact"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-hidden="true">
+  <path fill-rule="evenodd" d="M482.22,332.52c-.01-.39,0-.5-.08-.86-.14-.57-85.82-103.46-93.98-112.61-1-1.12-2.01-1.97-3.33-2.69-.8,2.78-31.48,31.23-35.51,33.52-.03-.99-.55-1.85-1.13-2.64-11.5-15.61-24.18-30.57-36.09-45.9-17.73-22.82-35.06-46.1-53.38-68.43-.77-1.09-1.86-2.1-2.77-3.09-30.75,39.76-62.93,78.43-93.85,118.06-12.64-10.04-24.22-21.66-36.08-32.61-32.12,39.21-64.47,78.24-97.04,117.09-2.08-6.63-4.07-13.29-5.98-19.97,9.85-10.75,18.75-22.25,28.03-33.48,11.48-13.64,22.89-27.33,34.23-41.08,8.46-10.37,18.24-24.51,28.11-33.24.34-.3.69-.59,1.06-.87.36-.28.73-.54,1.11-.8.38-.25.77-.49,1.17-.72.4-.23.8-.44,1.21-.64.41-.2.83-.38,1.25-.55.42-.17.85-.32,1.29-.46.44-.14.87-.26,1.32-.37.44-.11.89-.2,1.34-.28,14.9-2.48,26.16,15.01,37.13,22.65l56.09-70.76c7.48-9.5,17.65-24.92,26.03-32.52,3.09-2.8,6.7-3.93,10.71-4.79,5.75-.56,11.14.63,15.71,4.26,7.74,6.15,29.41,36.03,37.03,45.81,14.8,18.99,30.73,37.68,44.6,57.34.54.77.78,1.39.89,2.34,9.54-4.7,17.88-21.07,30.43-23.99,4.88-1.13,10.48.11,14.67,2.79,6.78,4.34,50.36,59.16,59.38,70.06,10.45,12.63,21.6,24.98,31.63,37.92.46.59.67,1.17.83,1.91.1.36.18.72.21,1.1.33,3.16-4.23,16.03-6.27,18.5h0ZM476.63,349.73c-.54,4.06-12.06,27.58-14.98,30.01-2.66-2.4-47.53-19.21-52.62-20.43.27.44.53.9.71,1.38,1.36,3.39,3.25,23.06,1.91,26.1-.02-.08-.03-.17-.05-.25-.32-1.2-1.14-1.92-1.98-2.77-9.03-9.14-18.81-17.6-28.05-26.54-7.66-7.42-28.87-30.07-36.08-34.2.05.4.08.79.05,1.2-.09,1.7-15.03,31.29-16.63,32.78-1.35-1.92-22.7-16.99-25.81-18.57-1.95-2.7-37.59-28.27-41.98-30.16-.45,2.87-31.45,46.86-36.05,53.65-10.95-15.18-20.9-31.31-31.49-46.77-11.64,7.73-22.77,16.74-33.99,25.09-20.23,14.89-40.35,29.94-60.36,45.12-.61-10.41-.83-20.86-1.22-31.28-16.36,7.62-33.68,13.8-50.46,20.48-4.43-8.53-8.82-17.17-12.46-26.08,9.77-13.44,21.54-25.92,32.15-38.74,19.42-23.46,38.53-47.24,58.41-70.31l12.92,22.26c-2.59,9.1-6.67,18.16-10.03,27.01-6.06,16.15-12.25,32.25-18.57,48.3,12.86-14.71,24.79-30.41,36.97-45.68l71.86-90.56c10.46-13.12,20.65-26.49,31.44-39.35,2.19,4.11,13,85.74,13.71,94.57.11,1.3,0,2.47-.33,3.73.51-.41.98-.86,1.37-1.38,2.69-3.52,19.92-42.78,19.6-45.19.61.3,1.24.63,1.78,1.04,4,3.02,7.71,7.45,11.26,11.02l25.83,26.25,49.63,50.62c8.08,8.28,16.74,16.41,24.37,25.1.8.91,1.13,1.74,1.34,2.92.04-.72.08-1.47,0-2.19-.36-3.08-35.96-62.76-39.36-65.72.44-.22.86-.48,1.26-.75,3.36-2.23,22.66-20.31,23.22-23.03.85.75,1.37,1.46,1.89,2.47,4.5,8.76,7.76,21.35,11.03,30.79,2.7,7.78,6.7,16.44,8.32,24.47.25,1.27-.02,2.42-.4,3.63.21-.29.41-.57.6-.87.08-.13.17-.27.25-.41.28-.45.54-.87.76-1.35,1.72-3.85,3.6-24.97,2.06-28.76.1.06.19.12.29.18.16.1.31.21.47.32.13.09.27.17.4.26,4.56,3.03,66.7,77.99,67.02,79.6.01.26.04.69,0,.98h0ZM511.07,234.07c-.36-4.17-.82-8.34-1.39-12.49-.56-4.15-1.22-8.29-1.99-12.4-.76-4.12-1.63-8.22-2.6-12.29-.97-4.07-2.04-8.13-3.2-12.15-1.16-4.02-2.42-8.02-3.79-11.98-1.36-3.96-2.82-7.89-4.37-11.78-1.55-3.89-3.2-7.74-4.94-11.55-1.75-3.81-3.58-7.57-5.51-11.29-1.93-3.72-3.94-7.39-6.05-11.01-2.11-3.62-4.31-7.19-6.59-10.7-2.28-3.51-4.65-6.97-7.11-10.36-2.45-3.4-4.98-6.73-7.6-10-2.62-3.27-5.31-6.48-8.09-9.62-2.77-3.14-5.62-6.21-8.55-9.21-2.92-3-5.92-5.92-8.99-8.78-3.07-2.85-6.2-5.63-9.41-8.33-3.21-2.7-6.48-5.32-9.81-7.85-3.33-2.54-6.73-4.99-10.18-7.36-3.45-2.37-6.96-4.66-10.53-6.85-3.57-2.2-7.19-4.31-10.85-6.33-3.67-2.02-7.39-3.95-11.15-5.79-3.77-1.84-7.58-3.58-11.42-5.23-3.85-1.65-7.74-3.21-11.66-4.67-3.93-1.46-7.89-2.82-11.88-4.09-3.99-1.27-8.01-2.43-12.06-3.5-4.05-1.07-8.13-2.04-12.23-2.91-4.1-.87-8.21-1.64-12.35-2.3-4.14-.67-8.29-1.23-12.45-1.69-4.16-.46-8.33-.82-12.52-1.08-4.18-.26-8.37-.41-12.55-.47-4.19-.05-8.38,0-12.56.15-4.19.15-8.36.41-12.54.77-4.17.36-8.33.82-12.48,1.38-4.15.56-8.28,1.23-12.4,1.99-4.12.77-8.21,1.63-12.29,2.6-4.07.97-8.12,2.03-12.15,3.2-4.02,1.17-8.01,2.43-11.97,3.79-3.96,1.36-7.88,2.82-11.77,4.37-3.89,1.55-7.74,3.2-11.54,4.95-3.81,1.74-7.57,3.58-11.29,5.51-3.72,1.93-7.39,3.95-11.01,6.05-3.62,2.11-7.18,4.3-10.69,6.59-3.51,2.28-6.96,4.65-10.36,7.1-3.4,2.45-6.73,4.99-10,7.6-3.27,2.62-6.47,5.31-9.61,8.08-3.14,2.77-6.21,5.62-9.2,8.55-3,2.92-5.92,5.92-8.77,8.99-2.85,3.07-5.63,6.2-8.32,9.41-2.7,3.2-5.31,6.47-7.85,9.8-2.54,3.33-4.99,6.72-7.36,10.18-2.37,3.45-4.65,6.96-6.85,10.53-2.2,3.56-4.31,7.18-6.33,10.85-2.02,3.67-3.95,7.38-5.79,11.15-1.84,3.76-3.58,7.57-5.23,11.42-1.65,3.85-3.21,7.73-4.67,11.66-1.46,3.92-2.82,7.88-4.09,11.88-1.27,3.99-2.43,8.01-3.5,12.06-1.07,4.05-2.04,8.12-2.91,12.22-.87,4.1-1.64,8.21-2.3,12.35-.67,4.13-1.23,8.28-1.7,12.44-.46,4.16-.82,8.33-1.08,12.51-.26,4.18-.41,8.36-.47,12.55-.05,4.19,0,8.37.15,12.56.15,4.19.41,8.36.77,12.54.36,4.17.82,8.33,1.38,12.48.56,4.15,1.23,8.28,1.99,12.4.76,4.12,1.63,8.21,2.6,12.29.97,4.07,2.03,8.12,3.2,12.15,1.16,4.02,2.43,8.02,3.79,11.98,1.36,3.96,2.82,7.89,4.37,11.77,1.55,3.89,3.2,7.74,4.94,11.55,1.74,3.81,3.58,7.57,5.5,11.29,1.93,3.72,3.94,7.39,6.05,11.01,2.11,3.62,4.3,7.19,6.58,10.7,2.28,3.51,4.65,6.96,7.1,10.36,2.45,3.39,4.98,6.73,7.6,10,2.62,3.27,5.31,6.48,8.08,9.61,2.77,3.14,5.62,6.21,8.54,9.21,2.92,3,5.92,5.92,8.99,8.78,3.07,2.85,6.2,5.63,9.4,8.33,3.2,2.7,6.47,5.31,9.8,7.85,3.33,2.54,6.72,4.99,10.18,7.36,3.45,2.37,6.96,4.66,10.52,6.86,3.56,2.2,7.18,4.31,10.85,6.33,3.67,2.02,7.38,3.95,11.15,5.79,3.76,1.84,7.57,3.58,11.42,5.24,3.85,1.65,7.73,3.21,11.66,4.67,3.92,1.46,7.88,2.82,11.88,4.09,3.99,1.27,8.01,2.43,12.06,3.5,4.05,1.07,8.12,2.04,12.22,2.91,4.1.87,8.21,1.64,12.35,2.31,4.14.67,8.28,1.23,12.44,1.7,4.16.46,8.33.83,12.51,1.09,4.18.26,8.37.41,12.55.47,4.19.05,8.37,0,12.56-.15,4.19-.15,8.37-.41,12.54-.76,4.17-.36,8.34-.82,12.49-1.38,4.15-.56,8.29-1.22,12.41-1.99,4.12-.76,8.21-1.63,12.29-2.59,4.08-.97,8.13-2.03,12.15-3.2,4.02-1.16,8.02-2.43,11.98-3.79,3.96-1.36,7.88-2.82,11.78-4.37,3.89-1.55,7.74-3.2,11.55-4.94,3.81-1.74,7.58-3.58,11.29-5.5,3.72-1.93,7.39-3.94,11.01-6.05,3.62-2.11,7.18-4.3,10.69-6.58,3.51-2.28,6.97-4.65,10.36-7.1,3.39-2.45,6.73-4.99,10.01-7.6,3.27-2.62,6.48-5.31,9.61-8.08,3.14-2.77,6.21-5.62,9.21-8.55,3-2.92,5.92-5.92,8.78-8.99,2.85-3.07,5.62-6.2,8.32-9.41,2.7-3.2,5.32-6.47,7.86-9.81,2.53-3.33,4.99-6.73,7.36-10.18,2.37-3.45,4.65-6.96,6.85-10.53,2.2-3.57,4.31-7.18,6.33-10.85,2.02-3.67,3.95-7.39,5.79-11.15,1.84-3.76,3.58-7.57,5.24-11.42,1.65-3.85,3.21-7.74,4.67-11.66,1.46-3.93,2.82-7.89,4.09-11.88,1.27-3.99,2.43-8.01,3.5-12.06,1.07-4.05,2.04-8.12,2.91-12.22.87-4.1,1.64-8.21,2.31-12.35.67-4.14,1.23-8.29,1.69-12.45.46-4.16.83-8.33,1.08-12.52.26-4.18.41-8.37.47-12.55.05-4.19,0-8.38-.15-12.56s-.41-8.37-.76-12.54h0Z"/>
+</svg></span>
+        <div class="app-title text-xl md:text-2xl text-white">Last Resort</div>
+      </div>
+      <div id="userBox" class="hidden text-sm">
+        <span id="userName" class="font-semibold"></span>
+        <button id="logoutBtn" class="ml-3 text-xs text-slate-400 hover:text-slate-200">Log out</button>
+      </div>
+    </header>
+    <!-- =============================== AUTH =================================== -->
+    <section id="authSection">
+      <div class="card p-6 rounded-2xl">
+        <!-- -------- Login -------- -->
+        <div id="authLoginForm" class="space-y-3">
+          <input id="authEmailInput" type="email" autocomplete="email"
+                 class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700"
+                 placeholder="Email"/>
+          <input id="authPasswordInput" type="password" autocomplete="current-password"
+                 class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700"
+                 placeholder="Password"/>
+          <button id="loginNowBtn"
+                  class="w-full py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500">Log in</button>
+          <div class="text-xs text-slate-400">
+            Don't have an account?
+            <button id="openSignupBtn" class="text-slate-200 underline">Create one</button>
+          </div>
+          <label class="inline-flex items-center gap-2 text-sm text-slate-400">
+            <input id="rememberMeCheckbox" type="checkbox" class="accent-fuchsia-500"> Remember me on this device
+          </label>
+        </div>
+        <!-- -------- Sign Up -------- -->
+        <div id="authSignupForm" class="space-y-3 hidden">
+          <div class="grid grid-cols-2 gap-3">
+            <input id="signupFirstNameInput" class="col-span-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700" placeholder="First name"/>
+            <input id="signupLastNameInput"  class="col-span-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700" placeholder="Last name"/>
+            <input id="signupEmailInput" type="email" class="col-span-2 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700" placeholder="Email"/>
+            <input id="signupPasswordInput"  type="password" class="col-span-2 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700" placeholder="Password"/>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="createAccountBtn" class="flex-1 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500">Create account</button>
+            <button type="button" id="backToLoginBtn" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700">Back</button>
+          </div>
+          <p class="text-xs text-slate-500">After signing up, you'll finish details in <em>My Profile</em>.</p>
+        </div>
+      </div>
+    </section>
+    <!-- =============================== APP ==================================== -->
+    <main id="appSection" class="hidden">
+      <!-- -------- Tabs -------- -->
+      <nav class="flex gap-4 border-b border-slate-800 mb-4">
+        <button class="tab-btn py-2 px-2 active" data-tab="my">My Resorts</button>
+        <button class="tab-btn py-2 px-2" data-tab="update">Update Resorts</button>
+        <button class="tab-btn py-2 px-2" data-tab="lead">Leaderboard</button>
+        <button class="tab-btn py-2 px-2" data-tab="others">Other Users</button>
+        <button class="tab-btn py-2 px-2" data-tab="profile">My Profile</button>
+      </nav>
+      <!-- ============================ TAB: MY RESORTS ========================== -->
+      <section id="tab-my" class="space-y-4">
+        <!-- Metrics -->
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="card rounded-2xl px-4 py-2">
+            <div class="text-slate-400 text-xs">My Resorts</div>
+            <div id="metricResorts" class="text-2xl mt-1">—</div>
+          </div>
+          <div class="card rounded-2xl px-4 py-2">
+            <div class="text-slate-400 text-xs">Countries Visited</div>
+            <div id="metricCountries" class="text-2xl mt-1">—</div>
+          </div>
+          <div class="card rounded-2xl px-4 py-2">
+            <div class="text-slate-400 text-xs">Continents Visited</div>
+            <div id="metricContinents" class="text-2xl mt-1">—</div>
+          </div>
+        </div>
+        <!-- Map -->
+        <div id="map" class="card"></div>
+        <!-- Countries Table -->
+        <div class="card p-4 rounded-2xl">
+          <div class="text-lg mb-3">Number of resorts by country</div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="text-slate-400">
+                <tr>
+                  <th class="text-left font-normal pb-2">Country</th>
+                  <th class="text-right font-normal pb-2">Resorts</th>
+                </tr>
+              </thead>
+              <tbody id="byCountryTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <!-- ========================= TAB: UPDATE RESORTS ========================= -->
+      <section id="tab-update" class="hidden space-y-4">
+        <div class="sticky top-0 z-10 bg-[#0b0f14] pt-1 pb-3">
+          <div class="flex items-center gap-3">
+            <input id="resortSearchInput" class="flex-1 px-3 py-2 rounded-lg bg-slate-900 border border-slate-700" placeholder="Search by resort or country…">
+            <span class="text-sm text-slate-400">Recently added:</span>
+            <div id="recentAddsContainer" class="flex gap-2"></div>
+          </div>
+        </div>
+        <div id="resortListContainer" class="grid md:grid-cols-2 gap-3"></div>
+        <div class="flex justify-start">
+          <button id="saveResortsBtn" class="px-4 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500">Save Visited Resorts</button>
+        </div>
+      </section>
+      <!-- =========================== TAB: LEADERBOARD ========================== -->
+      <section id="tab-lead" class="hidden space-y-4">
+        <div id="leaderboardContainer" class="grid md:grid-cols-3 gap-4"></div>
+      </section>
+      <!-- ============================ TAB: OTHERS ============================== -->
+      <section id="tab-others" class="hidden space-y-4">
+        <div id="othersMap" class="card"></div>
+        <div id="userDirectoryContainer" class="grid md:grid-cols-3 gap-4"></div>
+      </section>
+      <!-- =========================== TAB: PROFILE ============================== -->
+      <section id="tab-profile" class="hidden">
+        <div class="card p-6 rounded-2xl space-y-6 max-w-3xl">
+          <h3 class="text-xl">My Profile</h3>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label for="profileEmail" class="block text-sm text-slate-400 mb-1">Email (read-only)</label>
+              <input id="profileEmail" type="email" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700" disabled/>
+            </div>
+            <div>
+              <label for="profileFirstName" class="block text-sm text-slate-400 mb-1">First name</label>
+              <input id="profileFirstName" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700"/>
+            </div>
+            <div>
+              <label for="profileLastName" class="block text-sm text-slate-400 mb-1">Last name</label>
+              <input id="profileLastName" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700"/>
+            </div>
+            <div>
+              <label for="profileHomeCity" class="block text-sm text-slate-400 mb-1">Home City</label>
+              <input id="profileHomeCity" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700" placeholder="e.g. London"/>
+            </div>
+            <div class="md:col-span-2">
+              <label for="profileFavouriteResort" class="block text-sm text-slate-400 mb-1">Favourite Resort</label>
+              <select id="profileFavouriteResort" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700"></select>
+            </div>
+            <div>
+              <label for="profileMethod" class="block text-sm text-slate-400 mb-1">Going downhill I'm a:</label>
+              <select id="profileMethod" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700">
+                <option value="">— Select —</option>
+                <option value="Snowboard">🏂 Legend Snowboarder</option>
+                <option value="Ski">🎿 Loser Skier</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex justify-between gap-3">
+            <button id="saveProfileBtn" class="px-4 py-2 rounded-xl bg-fuchsia-600 hover:bg-fuchsia-500">Save Profile</button>
+            <button id="logoutBtn2" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700">Log out</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="fixed bottom-4 right-4 px-4 py-2 rounded-lg bg-slate-800 border border-slate-700 hidden"></div>
+  <!-- ============================= APP SCRIPT ================================ -->
+  <script src="app.js"></script>
+  <div id="loader" class="loader-overlay"><div class="flake">❄︎</div></div>
+</body>
+</html>
+

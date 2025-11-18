@@ -1,0 +1,21 @@
+node_modules/
+.DS_Store
+*.log
+.env
+.env.local
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+# Documentation files (optional - you can include them if you want)
+# APPS_SCRIPT_*.md
+# CORS_*.md
+# DEPLOYMENT.md
+# MIGRATION_*.md
+# QUICK_*.md
+# REDEPLOY_*.md
+# SETUP_*.md
+# Code.gs (this is for Apps Script, not the web app)
+# cors-proxy-server.js (only needed for local dev)
+# test-*.html (testing files)

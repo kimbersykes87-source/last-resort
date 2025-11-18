@@ -1,0 +1,11 @@
+# Cloudflare Pages configuration
+# This file is optional - Cloudflare Pages can auto-detect static sites
+# But you can use this for advanced configuration
+
+name = "last-resort"
+compatibility_date = "2024-01-01"
+
+[build]
+command = ""
+publish = "."
+
