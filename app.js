@@ -10,10 +10,9 @@ var CONSTANTS = {
   RECENT_ADDS_KEY: 'lr_recent_adds',
   TABS: ['my','update','lead','others','profile'],
   // Apps Script Web App URL
-  // Direct URL - works best with HTTPS (Cloudflare Pages)
-  // For localhost development, consider deploying to Cloudflare Pages first
-  // or use Chrome with --disable-web-security flag (development only)
-  API_URL: 'https://script.google.com/macros/s/AKfycbxTzqWvuj5DLQseoziCo9KIb2z2vYiZM6OpuTwlAOo4UPAWbL1QI3nndu9zKye11jrXcQ/exec'
+  // Use Cloudflare Worker proxy to handle CORS (more reliable than Apps Script CORS)
+  // The worker function at /api-proxy handles CORS headers properly
+  API_URL: '/api-proxy'
 };
 
 var state = {
