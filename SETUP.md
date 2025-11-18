@@ -38,6 +38,7 @@ Complete setup instructions for Last Resort application.
 1. **Open Apps Script**
    - In your Google Sheet: **Extensions → Apps Script**
    - This opens the Apps Script editor
+   - The script is now **bound** to your spreadsheet ✅
 
 2. **Copy Backend Code**
    - Open `Code.gs` from this repository
@@ -45,7 +46,13 @@ Complete setup instructions for Last Resort application.
    - Paste into Apps Script editor (replace default code)
    - **Save** (Ctrl+S or Cmd+S)
 
-3. **Deploy as Web App**
+3. **Verify Sheet Names**
+   - Your spreadsheet must have sheets named exactly:
+     - **`Users`** (capital U)
+     - **`resorts`** (lowercase r)
+   - Check the tabs at the bottom of your spreadsheet
+
+4. **Deploy as Web App**
    - Click **Deploy** → **New deployment**
    - Click the **gear icon** (⚙️) next to "Select type"
    - Choose **Web app**
@@ -57,11 +64,12 @@ Complete setup instructions for Last Resort application.
    - **Authorize** if prompted (click "Review permissions" → "Allow")
    - **Copy the deployment URL** (looks like: `https://script.google.com/macros/s/.../exec`)
 
-4. **Update Cloudflare Worker**
+5. **Update Cloudflare Worker**
    - Open `functions/api-proxy.js` in this repository
    - Find the line: `const APPS_SCRIPT_URL = '...'`
-   - Replace with your deployment URL from step 3
+   - Replace with your deployment URL from step 4
    - Save the file
+   - Commit and push to GitHub
 
 ## Step 3: Deploy to Cloudflare Pages
 
