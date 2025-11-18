@@ -13,7 +13,7 @@ var CONSTANTS = {
   // Direct URL - works best with HTTPS (Cloudflare Pages)
   // For localhost development, consider deploying to Cloudflare Pages first
   // or use Chrome with --disable-web-security flag (development only)
-  API_URL: 'https://script.google.com/macros/s/AKfycbzSl4REI2WDdc4RvGiSNeoxNM6hbFMWx4qXwpHwDS2v60FolqlKdGetUhUefK1dX-DrcQ/exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbxTzqWvuj5DLQseoziCo9KIb2z2vYiZM6OpuTwlAOo4UPAWbL1QI3nndu9zKye11jrXcQ/exec'
 };
 
 var state = {
