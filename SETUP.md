@@ -48,11 +48,34 @@ Complete setup instructions for Last Resort application.
 
 3. **Verify Sheet Names**
    - Your spreadsheet must have sheets named exactly:
-     - **`Users`** (capital U)
-     - **`resorts`** (lowercase r)
+     - **`Users`** (capital U) - Contains user data
+     - **`resorts`** (lowercase r) - Contains resort data
    - Check the tabs at the bottom of your spreadsheet
+   - These names are case-sensitive!
 
-4. **Deploy as Web App**
+4. **Verify Sheet Structure**
+
+   **Users Sheet** (Columns A-J):
+   - A: FirstName
+   - B: LastName
+   - C: Email
+   - D: Password (hashed - SHA-256)
+   - E: VisitedResorts (JSON array)
+   - F: HomeCity
+   - G: AvatarUrl (unused)
+   - H: LastUpdated (ISO timestamp)
+   - I: Method (Snowboard/Ski)
+   - J: FavouriteResort
+
+   **Resorts Sheet** (Columns A-F):
+   - A: Continent
+   - B: Country
+   - C: Name
+   - D: Gmaps
+   - E: Lat (latitude)
+   - F: Lon (longitude)
+
+5. **Deploy as Web App**
    - Click **Deploy** → **New deployment**
    - Click the **gear icon** (⚙️) next to "Select type"
    - Choose **Web app**
@@ -64,10 +87,10 @@ Complete setup instructions for Last Resort application.
    - **Authorize** if prompted (click "Review permissions" → "Allow")
    - **Copy the deployment URL** (looks like: `https://script.google.com/macros/s/.../exec`)
 
-5. **Update Cloudflare Worker**
+6. **Update Cloudflare Worker**
    - Open `functions/api-proxy.js` in this repository
    - Find the line: `const APPS_SCRIPT_URL = '...'`
-   - Replace with your deployment URL from step 4
+   - Replace with your deployment URL from step 5
    - Save the file
    - Commit and push to GitHub
 
