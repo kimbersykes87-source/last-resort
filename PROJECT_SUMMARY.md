@@ -4,14 +4,23 @@
 
 **The application is fully deployed and working on Cloudflare Pages!**
 
+### Production (Cloudflare Pages)
 - ✅ Frontend: Deployed to Cloudflare Pages
 - ✅ Backend: Google Apps Script API
 - ✅ Database: Google Sheets
-- ✅ CORS: Handled by Cloudflare Worker function
+- ✅ CORS: Handled by Cloudflare Worker function (`/api-proxy`)
 - ✅ Authentication: Working
 - ✅ All features: Operational
 - ✅ UI: Dark theme with loading indicators
 - ✅ Favicon: White fill for clean branding
+- ✅ URL: `https://last-resort.pages.dev`
+
+### Local Development
+- ⚠️ **Status**: **Not fully functional**
+- ✅ Static files can be served locally (`npm run dev`)
+- ❌ API calls fail locally (Cloudflare Worker `/api-proxy` only runs on Cloudflare Pages)
+- ❌ Cannot test authentication or data operations locally
+- **Workaround**: Test UI changes locally, then deploy to Cloudflare Pages for full testing
 
 ## 📁 Final Project Structure
 
@@ -81,9 +90,10 @@ last-resort/
 ### Updating Frontend
 
 1. Edit `index.html` or `app.js`
-2. Test locally: `npm run dev`
+2. Test UI locally: `npm run dev` (API calls won't work)
 3. Commit and push: `git push`
 4. Cloudflare Pages auto-deploys
+5. Test full functionality on production URL
 
 ### Adding New Features
 

@@ -86,6 +86,24 @@ To view build logs:
 3. Click on any deployment
 4. View build logs
 
+## Local Development Status
+
+⚠️ **Important Limitation**: Local development is **not fully functional** due to the Cloudflare Worker dependency.
+
+**The Issue:**
+- The `/api-proxy` endpoint is a Cloudflare Worker function
+- Cloudflare Workers only execute on Cloudflare's infrastructure
+- When running locally, requests to `/api-proxy` return 501 Method Not Allowed
+- This means all API calls (login, signup, data fetching) fail locally
+
+**Current Workaround:**
+1. Use `npm run dev` to test UI changes, styling, and layout
+2. Deploy to Cloudflare Pages to test full functionality including API calls
+3. The deployment process is fast (1-2 minutes), making this workflow manageable
+
+**Future Solution:**
+A local proxy server that mimics the Cloudflare Worker behavior could be developed, but this has not been implemented yet.
+
 ## Troubleshooting
 
 ### Build Fails
@@ -99,9 +117,16 @@ To view build logs:
 - Verify `functions/api-proxy.js` exists
 - Check Functions tab in Cloudflare Dashboard
 - Verify the file is committed to git
+- Test the endpoint: `https://last-resort.pages.dev/api-proxy` (should return error or response, not 404)
 
 ### Files Not Deploying
 
 - Check `.gitignore` - files might be excluded
 - Verify files are committed: `git status`
 - Check build output directory setting
+
+### Local Development Issues
+
+- ❌ **API calls not working locally**: This is expected - the Cloudflare Worker only runs on Cloudflare Pages
+- ✅ **UI testing works**: Use `npm run dev` to test HTML/CSS/JS layout
+- ✅ **Full testing**: Deploy to Cloudflare Pages and test there

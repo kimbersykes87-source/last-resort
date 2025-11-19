@@ -163,6 +163,35 @@ Complete setup instructions for Last Resort application.
 - Verify all files are committed to git
 - Ensure `index.html` exists in root directory
 
+## Local Development
+
+⚠️ **Important**: Local development is **not fully functional** for this application.
+
+**The Issue:**
+- The `/api-proxy` endpoint is a Cloudflare Worker function that only executes on Cloudflare Pages
+- When running locally, API calls to `/api-proxy` will fail (returns 501 Method Not Allowed)
+- This means authentication, data fetching, and all backend operations won't work locally
+
+**What You CAN Do Locally:**
+- ✅ Test HTML structure and layout
+- ✅ Test CSS styling and design
+- ✅ Test JavaScript UI interactions (without API calls)
+- ✅ Use `npm run dev` to serve static files
+
+**What You CANNOT Do Locally:**
+- ❌ Test login/signup functionality
+- ❌ Test API calls
+- ❌ Test authentication
+- ❌ Test data operations
+
+**Workaround:**
+1. Make UI changes locally
+2. Test layout/styling with `npm run dev`
+3. Push to GitHub and test full functionality on Cloudflare Pages
+4. The deployment is fast (1-2 minutes), making this workflow manageable
+
+**Future:** A local proxy server could be developed to mimic the Cloudflare Worker, but this has not been implemented yet.
+
 ## Next Steps
 
 Once setup is complete:
@@ -170,6 +199,7 @@ Once setup is complete:
 - ✅ Users can sign up and log in
 - ✅ Data is stored in Google Sheets
 - ✅ Automatic deployments on every git push
+- ⚠️ Local development is limited (UI testing only)
 
 ## Support
 

@@ -51,6 +51,19 @@ A web application for tracking visited ski resorts around the world. Built with 
 
 ### Local Development
 
+⚠️ **Important**: Local development is currently **not fully functional**. The `/api-proxy` endpoint is a Cloudflare Worker function that only runs on Cloudflare Pages, so API calls will fail when running locally.
+
+**Current Status:**
+- ✅ Static files (HTML, CSS, JS) can be served locally
+- ❌ API calls to `/api-proxy` will fail locally (returns 501 Method Not Allowed)
+- ✅ Full functionality works on Cloudflare Pages production
+
+**Workaround for Testing:**
+1. Make changes locally to HTML/JS/CSS
+2. Test the UI structure and layout with `npm run dev`
+3. For full testing including API calls, push to GitHub and test on Cloudflare Pages
+
+**To serve files locally (UI testing only):**
 1. **Clone the repository**
    ```bash
    git clone https://github.com/kimbersykes87-source/last-resort.git
@@ -66,7 +79,7 @@ A web application for tracking visited ski resorts around the world. Built with 
    ```bash
    npm run dev
    ```
-   Visit `http://localhost:8080`
+   Visit `http://localhost:8080` (API calls will not work)
 
 ### Production Deployment
 
@@ -183,19 +196,30 @@ No environment variables needed - everything is configured in code.
 
 ### Local Testing
 
-For local development, you can:
-- Use Chrome with CORS disabled (development only):
-  ```bash
-  chrome.exe --user-data-dir="C:/ChromeDevSession" --disable-web-security
-  ```
-- Or deploy to Cloudflare Pages and test there
+⚠️ **Limitation**: Local testing is **partial only**. API calls will not work locally because the `/api-proxy` endpoint is a Cloudflare Worker that only runs on Cloudflare Pages.
+
+**What works locally:**
+- HTML structure and layout
+- CSS styling
+- JavaScript UI interactions (without API calls)
+- Static file serving
+
+**What doesn't work locally:**
+- All API calls (login, signup, data fetching)
+- Authentication
+- Any features requiring backend access
+
+**Testing Approach:**
+1. Test UI changes locally with `npm run dev`
+2. Test full functionality on Cloudflare Pages after deployment
 
 ### Production Testing
 
-1. Visit your Cloudflare Pages URL
+1. Visit your Cloudflare Pages URL (`https://last-resort.pages.dev`)
 2. Test login/signup
 3. Test all features
 4. Check browser console for errors
+5. Verify Cloudflare Worker function is working (check `/api-proxy` endpoint)
 
 ## 🐛 Troubleshooting
 
@@ -227,11 +251,13 @@ For local development, you can:
 ## 🔄 Deployment Workflow
 
 1. Make changes locally
-2. Test with `npm run dev`
+2. Test UI/layout with `npm run dev` (API calls won't work)
 3. Commit changes: `git add . && git commit -m "Description"`
 4. Push to GitHub: `git push`
-5. Cloudflare Pages automatically deploys
-6. Test on production URL
+5. Cloudflare Pages automatically deploys (1-2 minutes)
+6. Test full functionality on production URL (`https://last-resort.pages.dev`)
+
+⚠️ **Note**: Full end-to-end testing (including API calls) must be done on Cloudflare Pages, not locally.
 
 ## 📄 License
 
